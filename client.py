@@ -1,6 +1,7 @@
 import pickle
 import socket
 import threading
+import typing
 
 import pygame.display
 
@@ -8,6 +9,9 @@ import grid_client
 
 
 class Client:
+    """
+    Client connects to a server and draws a game window. Then processes data from the server and reacts accordingly.
+    """
 
     def __init__(self, addr: tuple[str, int]):
         self.addr = addr
@@ -17,13 +21,17 @@ class Client:
         self.grid = grid_client.Grid()
         self.running = True
 
-    def start(self):
+    def start(self) -> None:
+        """
+        Connects the client to the server, starts to receive messages from it and starts the game window itself.
+        :return:
+        """
         self.sock.connect(self.addr)
         recv_data = threading.Thread(target=self._receive_data, daemon=True)
         recv_data.start()
-        self.loop()
+        self._loop()
 
-    def process_data(self, data: dict):
+    def _process_data(self, data: dict) -> None:
         print(data)
         if "player_id" in data:
             if not self.player:
@@ -43,16 +51,21 @@ class Client:
             }
             print(result_quotes[data["winner"]])
 
-    def send(self, message):
+    def send(self, message: typing.Any) -> None:
+        """
+        Sends a message to the server.
+        :param message: Can be of any data type. Here it's using dictionary.
+        :return:
+        """
         self.sock.send(pickle.dumps(message))
 
-    def _receive_data(self):
+    def _receive_data(self) -> None:
         while True:
             data = self.sock.recv(1024)
             print("Client: ", pickle.loads(data))
-            self.process_data(pickle.loads(data))
+            self._process_data(pickle.loads(data))
 
-    def loop(self):
+    def _loop(self) -> None:
         surface = pygame.display.set_mode((600, 600))
         pygame.display.set_caption("Tic-Tac-Toe")
         while self.running:

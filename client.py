@@ -32,7 +32,6 @@ class Client:
         self._loop()
 
     def _process_data(self, data: dict) -> None:
-        print(data)
         if "player_id" in data:
             if not self.player:
                 self.player = data["player_id"]
@@ -62,7 +61,6 @@ class Client:
     def _receive_data(self) -> None:
         while True:
             data = self.sock.recv(1024)
-            print("Client: ", pickle.loads(data))
             self._process_data(pickle.loads(data))
 
     def _loop(self) -> None:
@@ -82,7 +80,6 @@ class Client:
                                 "player_id": self.player
                             }
                             self.send(message)
-                            print(f"Client: sending {message}")
                 else:
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_ESCAPE:

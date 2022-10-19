@@ -5,6 +5,9 @@ import client
 import server
 
 
+usage = "Usage: {} --host=IPADDR --port=PORT [--server]"
+
+
 def parse_cl_arguments(argv: list[str]) -> dict:
     """
     Parses command line arguments and returns a dictionary
@@ -37,13 +40,12 @@ def process_arguments(args: dict) -> None:
         try:
             run_server((args["arguments"]["host"], int(args["arguments"]["port"])))
         except KeyError or TypeError:
-            raise SystemExit(f"Usage: {args['filename']} --host=IPADDR --port=PORT (--server|--client)")
-    else:
-        raise SystemExit(f"Usage: {args['filename']} --host=IPADDR --port=PORT (--server|--client)")
+            raise SystemExit(usage.format(args["filename"]))
+
     try:
         run_client((args["arguments"]["host"], int(args["arguments"]["port"])))
     except KeyError or TypeError:
-        raise SystemExit(f"Usage: {args['filename']} --host=IPADDR --port=PORT (--server|--client)")
+        raise SystemExit(usage.format(args["filename"]))
 
 
 def run_server(addr: tuple[str, int]) -> None:

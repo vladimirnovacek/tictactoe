@@ -6,3 +6,5 @@ Usage: `python3 tictactoe.py --host=HOST --port=PORT (--server|--client)`
 
 For example run `python3 tictactoe.py --host=127.0.0.1 --port=65432 --server` which starts a server and a client that connects to that server and `python3 tictactoe.py --host=127.0.0.1 --port=65432 --client` which creates the second client and then the game is on.
 
+After a game is over, it will automatically start over after both players press space.
+

@@ -1,5 +1,9 @@
 
 class Grid:
+    """
+    A class that holds the game logic, stores which cells were already filled, which player is on turn and eventually
+    who is the winner.
+    """
 
     def __init__(self):
         self.search_dirs = (

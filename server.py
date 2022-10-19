@@ -1,6 +1,7 @@
 import pickle
 import socket
 import threading
+import typing
 
 import grid_server
 
@@ -15,20 +16,35 @@ class Server:
         self.grid = grid_server.Grid()
         self.reset_request = 0
 
-    def start(self):
+    def start(self) -> None:
+        """
+        Starts the server. Waits for connection of clients and then processes a communication with them.
+        :return:
+        """
         self.sock.bind(self.addr)
         self.sock.listen(2)
         waiting_for_connection = threading.Thread(target=self._waiting_for_connection, daemon=True)
         waiting_for_connection.start()
 
-    def send(self, message, client: int):
+    def send(self, message: typing.Any, client: int) -> None:
+        """
+        Send a message to a given client.
+        :param message: Can be of any data type. Here it's using dictionary.
+        :param client: Client socket
+        :return:
+        """
         self.connected[client].send(pickle.dumps(message))
 
-    def broadcast(self, message):
+    def broadcast(self, message: typing.Any) -> None:
+        """
+        Send a message to all clients.
+        :param message: Can be of any data type. Here it's using dictionary.
+        :return:
+        """
         for c in self.connected:
             self.send(message, c)
 
-    def process_data(self, data: dict):
+    def _process_data(self, data: dict) -> None:
         message = dict()
         if not self.connection_established:
             return
@@ -61,7 +77,7 @@ class Server:
         if message:
             self.broadcast(message)
 
-    def _waiting_for_connection(self):
+    def _waiting_for_connection(self) -> None:
         recv_data = set()
         while not self.connection_established:
             conn, addr = self.sock.accept()
@@ -70,12 +86,12 @@ class Server:
             t.start()
             recv_data.add(t)
 
-    def _receive_data(self, conn):
+    def _receive_data(self, conn: socket.socket) -> None:
         while True:
             data = pickle.loads(conn.recv(1024))
-            self.process_data(data)
+            self._process_data(data)
 
-    def _add_client(self, conn):
+    def _add_client(self, conn: socket.socket) -> None:
         message = {}
         if not self.connected[1]:
             self.connected[1] = conn

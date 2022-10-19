@@ -11,50 +11,62 @@ class Grid:
         self.winner = 0
         self.game_over = False
 
-    def push_turn(self):
+    def _push_turn(self):
         self.on_turn = 3 - self.on_turn
 
-    def reset(self):
+    def reset(self) -> None:
+        """
+        Prepares the grid for a new game.
+        :return:
+        """
         self.grid = [[0 for _ in range(3)] for _ in range(3)]
         self.winner = 0
         self.game_over = False
 
-    def grid_full(self):
-        if all([i for col in self.grid for i in col]):
-            return True
-        return False
+    def _grid_full(self) -> bool:
+        return all([i for col in self.grid for i in col])
 
-    def cell_selected(self, xx, yy, player):
-        cell_value = self.get_cell_value(xx, yy)
+    def cell_selected(self, xx: int, yy: int, player: int) -> int:
+        """
+        Attepmts to place a symbol of the player to the given cell. If the game is over after this, it also sets
+        the game_over and winner property.
+        :param xx: Column
+        :param yy: Row
+        :param player: Player id
+        :return: Id of a player who's on turn now.
+        """
+        cell_value = self._get_cell_value(xx, yy)
         if cell_value == 0:
-            self.set_cell(xx, yy, player)
-            self.push_turn()
-            if self.grid_full():
+            self._set_cell(xx, yy, player)
+            self._push_turn()
+            if self._grid_full():
                 self.game_over = True
-            if self.check_grid(xx, yy, player):
-                self.set_winner(player)
-            return 3 - player
-        return player
+            if self._check_grid(xx, yy, player):
+                self._set_winner(player)
+        return self.on_turn
 
-    def set_winner(self, player):
+    def _set_winner(self, player:int) -> None:
         self.winner = player
         self.game_over = True
 
-    def get_cell_value(self, xx: int, yy: int) -> int:
+    def _get_cell_value(self, xx: int, yy: int) -> int:
         return self.grid[xx][yy]
 
-    def set_cell(self, xx: int, yy: int, value: int) -> None:
+    def _set_cell(self, xx: int, yy: int, value: int) -> None:
         self.grid[xx][yy] = value
 
     @staticmethod
-    def get_cell_indexes(x, y):
-        return tuple(i // 200 for i in (x, y))
-
-    @staticmethod
-    def _is_in_bounds(xx, yy):
+    def _is_in_bounds(xx: int, yy: int) -> bool:
         return 0 <= xx < 3 and 0 <= yy < 3
 
-    def check_grid(self, xx, yy, player):
+    def _check_grid(self, xx: int, yy: int, player: int) -> int:
+        """
+        Checks if there are 3 in a row after placing a symbol to a given cell.
+        :param xx: Column
+        :param yy: Row
+        :param player: Player id
+        :return: Player id if he has 3 in a row, else 0.
+        """
         count = 1
         for direction in self.search_dirs:
             for multiplicator in (1, -1):
@@ -63,7 +75,7 @@ class Grid:
                 xxx += direction[0]
                 yyy += direction[1]
                 while self._is_in_bounds(xxx, yyy):
-                    if self.get_cell_value(xxx, yyy) == player:
+                    if self._get_cell_value(xxx, yyy) == player:
                         count += 1
                         xxx += direction[0]
                         yyy += direction[1]
